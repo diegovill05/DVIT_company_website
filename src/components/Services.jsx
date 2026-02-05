@@ -1,11 +1,18 @@
-import { useState, useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 
 export default function Services() {
   const sectionRef = useRef(null);
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-  const [isHovering, setIsHovering] = useState(false);
+  const overlayRef = useRef(null);
+
   const rafRef = useRef(null);
+  const animateRef = useRef(null);
+
+  // Cursor positions (target = real mouse, current = smoothed)
+  const targetPosRef = useRef({ x: 0, y: 0 });
+  const currentPosRef = useRef({ x: 0, y: 0 });
+
+  const [isHovering, setIsHovering] = useState(false);
   const [isTouchDevice, setIsTouchDevice] = useState(false);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
 
@@ -23,33 +30,77 @@ export default function Services() {
     return () => {
       mediaQuery.removeEventListener('change', handleChange);
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      if (animateRef.current) cancelAnimationFrame(animateRef.current);
     };
   }, []);
+
+  // Smoothly animate currentPos toward targetPos (premium “lag” feel)
+  const startSmoothingLoop = () => {
+    if (animateRef.current) cancelAnimationFrame(animateRef.current);
+
+    const step = () => {
+      const overlay = overlayRef.current;
+      if (!overlay) return;
+
+      const target = targetPosRef.current;
+      const current = currentPosRef.current;
+
+      // Lerp factor (higher = faster follow). Keep subtle.
+      const ease = 0.12;
+
+      current.x += (target.x - current.x) * ease;
+      current.y += (target.y - current.y) * ease;
+
+      // Two-layer glow for depth (more noticeable but still professional)
+      overlay.style.background = `
+        radial-gradient(850px circle at ${current.x}px ${current.y}px, rgba(37, 99, 235, 0.16), transparent 48%),
+        radial-gradient(520px circle at ${current.x}px ${current.y}px, rgba(99, 102, 241, 0.10), transparent 55%)
+      `;
+
+      animateRef.current = requestAnimationFrame(step);
+    };
+
+    animateRef.current = requestAnimationFrame(step);
+  };
+
+  const stopSmoothingLoop = () => {
+    if (animateRef.current) cancelAnimationFrame(animateRef.current);
+    animateRef.current = null;
+  };
 
   const handleMouseMove = (e) => {
     if (isTouchDevice || prefersReducedMotion) return;
 
+    // throttle mouse events (compute target only)
     if (rafRef.current) cancelAnimationFrame(rafRef.current);
 
     rafRef.current = requestAnimationFrame(() => {
-      if (sectionRef.current) {
-        const rect = sectionRef.current.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        setMousePos({ x, y });
+      const section = sectionRef.current;
+      if (!section) return;
+
+      const rect = section.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      targetPosRef.current = { x, y };
+
+      // Initialize current position on first move to avoid a “jump”
+      if (!isHovering) {
+        currentPosRef.current = { x, y };
       }
     });
   };
 
   const handleMouseEnter = () => {
-    if (!isTouchDevice && !prefersReducedMotion) {
-      setIsHovering(true);
-    }
+    if (isTouchDevice || prefersReducedMotion) return;
+    setIsHovering(true);
+    startSmoothingLoop();
   };
 
   const handleMouseLeave = () => {
     setIsHovering(false);
     if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    stopSmoothingLoop();
   };
 
   const services = [
@@ -119,9 +170,7 @@ export default function Services() {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-      },
+      transition: { staggerChildren: 0.1 },
     },
   };
 
@@ -130,10 +179,7 @@ export default function Services() {
     visible: {
       opacity: 1,
       y: 0,
-      transition: {
-        duration: 0.5,
-        ease: 'easeOut',
-      },
+      transition: { duration: 0.5, ease: 'easeOut' },
     },
   };
 
@@ -144,23 +190,27 @@ export default function Services() {
       onMouseMove={handleMouseMove}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      className="section-padding bg-slate-50 relative overflow-hidden"
+      className="section-padding relative overflow-hidden"
+      // Base background: subtle vertical gradient + slightly stronger dot pattern
       style={{
-        backgroundImage: `radial-gradient(circle at 1px 1px, rgb(148 163 184 / 0.08) 1px, transparent 0)`,
-        backgroundSize: '40px 40px',
+        backgroundImage: `
+          linear-gradient(180deg, rgba(37, 99, 235, 0.08), rgba(248, 250, 252, 0.95) 60%, rgba(255, 255, 255, 1)),
+          radial-gradient(circle at 1px 1px, rgb(148 163 184 / 0.12) 1px, transparent 0)
+        `,
+        backgroundSize: 'auto, 40px 40px',
+        backgroundColor: '#f8fafc',
       }}
     >
-      {/* Cursor glow overlay */}
+      {/* Cursor glow overlay (background set via JS for smoothing) */}
       <div
+        ref={overlayRef}
         className="absolute inset-0 pointer-events-none transition-opacity duration-500"
         style={{
           opacity: isHovering ? 1 : 0,
-          background: `radial-gradient(600px circle at ${mousePos.x}px ${mousePos.y}px, rgba(37, 99, 235, 0.08), transparent 40%)`,
         }}
       />
 
       <div className="container-custom relative z-10">
-        {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -177,7 +227,6 @@ export default function Services() {
           </p>
         </motion.div>
 
-        {/* Service Cards Grid */}
         <motion.div
           variants={containerVariants}
           initial="hidden"

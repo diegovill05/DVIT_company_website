@@ -1,6 +1,57 @@
+import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 
 export default function Services() {
+  const sectionRef = useRef(null);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [isHovering, setIsHovering] = useState(false);
+  const rafRef = useRef(null);
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+
+  useEffect(() => {
+    // Detect touch device
+    setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0);
+
+    // Detect prefers-reduced-motion
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setPrefersReducedMotion(mediaQuery.matches);
+
+    const handleChange = (e) => setPrefersReducedMotion(e.matches);
+    mediaQuery.addEventListener('change', handleChange);
+
+    return () => {
+      mediaQuery.removeEventListener('change', handleChange);
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    };
+  }, []);
+
+  const handleMouseMove = (e) => {
+    if (isTouchDevice || prefersReducedMotion) return;
+
+    if (rafRef.current) cancelAnimationFrame(rafRef.current);
+
+    rafRef.current = requestAnimationFrame(() => {
+      if (sectionRef.current) {
+        const rect = sectionRef.current.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        setMousePos({ x, y });
+      }
+    });
+  };
+
+  const handleMouseEnter = () => {
+    if (!isTouchDevice && !prefersReducedMotion) {
+      setIsHovering(true);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovering(false);
+    if (rafRef.current) cancelAnimationFrame(rafRef.current);
+  };
+
   const services = [
     {
       icon: (
@@ -87,8 +138,28 @@ export default function Services() {
   };
 
   return (
-    <section id="services" className="section-padding bg-white">
-      <div className="container-custom">
+    <section
+      id="services"
+      ref={sectionRef}
+      onMouseMove={handleMouseMove}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      className="section-padding bg-slate-50 relative overflow-hidden"
+      style={{
+        backgroundImage: `radial-gradient(circle at 1px 1px, rgb(148 163 184 / 0.08) 1px, transparent 0)`,
+        backgroundSize: '40px 40px',
+      }}
+    >
+      {/* Cursor glow overlay */}
+      <div
+        className="absolute inset-0 pointer-events-none transition-opacity duration-500"
+        style={{
+          opacity: isHovering ? 1 : 0,
+          background: `radial-gradient(600px circle at ${mousePos.x}px ${mousePos.y}px, rgba(37, 99, 235, 0.08), transparent 40%)`,
+        }}
+      />
+
+      <div className="container-custom relative z-10">
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}

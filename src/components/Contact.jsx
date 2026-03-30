@@ -171,7 +171,12 @@ export default function Contact() {
               >
                 {/* Hidden fields for Netlify */}
                 <input type="hidden" name="form-name" value="contact" />
-                <input type="hidden" name="bot-field" />
+                <p className="hidden" aria-hidden="true">
+                  <label>
+                    Don't fill this out if you're human:
+                    <input name="bot-field" tabIndex={-1} autoComplete="off" />
+                  </label>
+                </p>
 
                 {/* Name */}
                 <div>

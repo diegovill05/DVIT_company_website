@@ -1,38 +1,33 @@
-# Project Rules for Claude
+# Claude Project Instructions
 
-## Project Type
-This is a **static website** for a small-business IT support and consulting company.
+This project is the DVIT Consulting website.
 
-## Core Principles
+## Tech Stack
+- React
+- Vite
+- Tailwind CSS
+- Framer Motion
+- Netlify deployment
 
-### 1. Keep It Simple
-- Pure HTML, CSS, and vanilla JavaScript only
-- No frameworks, build tools, or package managers
-- No unnecessary dependencies or complexity
+## Development Rules
+- Keep the site a marketing/business website, not a web app.
+- Do not add backend logic unless explicitly requested.
+- Do not introduce unnecessary dependencies.
+- Prefer clean, maintainable React components.
+- Keep all animations subtle, smooth, and professional.
+- Prioritize accessibility, responsiveness, and performance.
+- Preserve Netlify Forms compatibility when editing the contact form.
+- Do not remove existing working features unless explicitly asked.
 
-### 2. Professional Focus
-- Target audience: small businesses seeking IT support and consulting services
-- Professional, clean, and trustworthy presentation
-- Clear communication of services and value proposition
+## Design Rules
+- Follow the design system in `design_brief.md`.
+- Keep UI business-friendly, modern, and trustworthy.
+- Avoid overly flashy startup design, gimmicks, or aggressive cyber aesthetics.
+- Use consistent spacing, typography, card styling, and interaction patterns.
+- Favor clarity and conversion over visual complexity.
 
-### 3. Static Site Requirements
-- All content should be static HTML
-- No server-side processing required
-- Must be hostable on any static hosting platform
-- Fast loading and lightweight
-
-## Development Guidelines
-
-- Prioritize accessibility and semantic HTML
-- Ensure mobile responsiveness
-- Keep file sizes minimal
-- Use clear, maintainable code
-- Follow web standards and best practices
-
-## What to Avoid
-
-- Complex JavaScript frameworks or libraries
-- Build processes or compilation steps
-- Over-engineering or unnecessary features
-- Flashy or unprofessional design elements
-- Large dependencies or external resources that slow loading
+## Editing Guidelines
+- Reuse existing layout patterns when possible.
+- Keep components modular and readable.
+- When improving design, prefer enhancing current sections instead of replacing everything unnecessarily.
+- Maintain clean mobile layouts and polished desktop layouts.

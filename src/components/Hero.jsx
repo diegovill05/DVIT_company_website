@@ -114,7 +114,7 @@ export default function Hero() {
                 (label) => (
                   <div key={label} className="flex items-center gap-2">
                     <svg
-                      className="w-4.5 h-4.5 text-accent flex-shrink-0"
+                      className="w-5 h-5 text-accent flex-shrink-0"
                       fill="currentColor"
                       viewBox="0 0 20 20"
                       aria-hidden="true"

@@ -60,9 +60,9 @@ export default function Header() {
             className="flex items-center transition-opacity hover:opacity-80"
           >
             <img
-              src="/assets/DVIT%20Consulting%20Logo.jpg"
+              src="/assets/DVIT%20Consulting%20Clear%20Logo.png"
               alt="DVIT Consulting logo"
-              className="h-12 w-auto md:h-14"
+              className="h-[72px] w-auto"
             />
           </a>
 

@@ -62,7 +62,7 @@ export default function Header() {
             <img
               src="/assets/DVIT%20Consulting%20Logo.jpg"
               alt="DVIT Consulting logo"
-              className="h-9 w-auto md:h-10"
+              className="h-12 w-auto md:h-14"
             />
           </a>
 

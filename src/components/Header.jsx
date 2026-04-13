@@ -57,9 +57,13 @@ export default function Header() {
           <a
             href="#home"
             onClick={(e) => handleNavClick(e, '#home')}
-            className="text-2xl font-bold text-primary hover:text-primary-dark transition-colors"
+            className="flex items-center transition-opacity hover:opacity-80"
           >
-            DVIT Consulting
+            <img
+              src="/assets/DVIT%20Consulting%20Logo.jpg"
+              alt="DVIT Consulting logo"
+              className="h-9 w-auto md:h-10"
+            />
           </a>
 
           {/* Desktop Navigation */}
